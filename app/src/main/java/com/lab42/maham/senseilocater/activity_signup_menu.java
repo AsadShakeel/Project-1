@@ -19,6 +19,7 @@ public class activity_signup_menu extends AppCompatActivity {
         b1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+int i;
                 Intent intent = new Intent(getApplicationContext(),activity_students_form.class);
                 startActivity(intent);
             }
