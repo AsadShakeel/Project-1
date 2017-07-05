@@ -126,9 +126,9 @@ public class EditProfileFragment extends Fragment implements View.OnClickListene
 
                 break;
             case R.id.btn_submit:
-                Toast.makeText(getContext(),"asadasadasad",Toast.LENGTH_SHORT).show();
+                //Toast.makeText(getContext(),"asadasadasad",Toast.LENGTH_SHORT).show();
+
                 Teacher t = new Teacher();
-                et_name.toString();
                 t.setId("7");
                 t.setName(et_name.getText().toString());
                 t.setEducation(et_education.getText().toString());
@@ -139,7 +139,7 @@ public class EditProfileFragment extends Fragment implements View.OnClickListene
                 t.setPost("Junior");
                 t.setAvailable("false");
 
-                new MyAsyncTask().execute(t.toString(), t.getId());
+                new MyAsyncTask().execute(t);
                 break;
             default:
                 break;
@@ -222,44 +222,52 @@ public class EditProfileFragment extends Fragment implements View.OnClickListene
     }
 
 
-    public class MyAsyncTask extends AsyncTask<String , String , String> {
+    public class MyAsyncTask extends AsyncTask<Teacher, String , String> {
 
         @Override
-        protected String doInBackground(String... params) {
-            String t = params[0];
-            String id = params[1];
-
+        protected String doInBackground(Teacher... params) {
+            Teacher t = params[0];
+            //String t = params[0];
+            //String id = params[1];
+            int responceCode = 0;
+            String response = "Something went wrong!!";
             HttpURLConnection urlConnection = null;
             URL url = null;
+
             try {
-                url = new URL("http://senseilocatorwebservices.apphb.com/api/Teacher/");// + id);
+                url = new URL("http://senseilocatorwebservices.apphb.com/api/Teacher/" + t.getId());
                 urlConnection = (HttpURLConnection) url.openConnection();
-                urlConnection.setRequestMethod("POST");
+                urlConnection.setRequestMethod("PUT");
                 urlConnection.setRequestProperty("Content-Type", "application/json");
-                urlConnection.connect();
 
                 JSONObject obj = new JSONObject();
-                obj.put("Id", "7");
-                obj.put("Name", "Fahad");
-                obj.put("Email","fff");
-                obj.put("Location","fati");
-                obj.put("Education","Phd");
-                obj.put("Password","123");
-                obj.put("Post","junior");
-                obj.put("Available","false");
+                obj.put("Id", t.getId());
+                obj.put("Name", t.getName());
+                obj.put("Email",t.getEmail());
+                obj.put("Location",t.getLocation());
+                obj.put("Education",t.getEducation());
+                obj.put("Password",t.getPassword());
+                obj.put("Post",t.getPost());
+                obj.put("Available",t.getAvailable());
+                String JsonString = obj.toString();
 
-                String temp = obj.toString();
-
+                urlConnection.connect();
                 DataOutputStream wr = new DataOutputStream(urlConnection.getOutputStream());
-                wr.writeBytes(temp);
+                wr.writeBytes(JsonString);
 
+                responceCode = urlConnection.getResponseCode();
+                if (responceCode != 200){
+                    response = "Please Try Later. Error Code: " + responceCode;
+                }else{
+                    response = "Succeed with Code: " + responceCode;
+                }
             } catch (Exception e){
                 e.printStackTrace();
             }
             finally {
                 urlConnection.disconnect();
             }
-            return "Successful";
+            return response;
         }
 
         @Override
@@ -268,5 +276,5 @@ public class EditProfileFragment extends Fragment implements View.OnClickListene
             Toast.makeText(getContext(),o,Toast.LENGTH_SHORT).show();
         }
     }
-    
+
 }
